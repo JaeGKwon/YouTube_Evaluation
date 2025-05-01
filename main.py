@@ -1,9 +1,9 @@
 import streamlit as st
-import openai
+from openai import OpenAI
+import os
 
-# Replace with your OpenAI API key or load from environment variable
-OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY'
-openai.api_key = OPENAI_API_KEY
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 st.set_page_config(page_title="YouTube Evaluation Generator", layout="wide")
 st.title("🎥 YouTube Evaluation Generator")
@@ -33,24 +33,27 @@ if st.button("Generate Evaluation"):
         Present the output in structured bullet points and tables where appropriate.
         """
 
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.5
-        )
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5
+            )
+            evaluation = response.choices[0].message.content
 
-        evaluation = response['choices'][0]['message']['content']
+            # Display generated evaluation
+            st.subheader("📊 Generated Evaluation")
+            st.markdown(evaluation)
 
-    # Display generated evaluation
-    st.subheader("📊 Generated Evaluation")
-    st.markdown(evaluation)
+            # Option to download as text file
+            st.download_button(
+                label="Download Evaluation as Text",
+                data=evaluation,
+                file_name="youtube_evaluation.txt",
+                mime="text/plain"
+            )
 
-    # Option to download as text file
-    st.download_button(
-        label="Download Evaluation as Text",
-        data=evaluation,
-        file_name="youtube_evaluation.txt",
-        mime="text/plain"
-    )
+        except Exception as e:
+            st.error(f"❌ An error occurred: {e}")
 
-st.sidebar.markdown("ℹ️ Provide the video title and description, then click **Generate**. The app will use ChatGPT to produce a detailed evaluation.")
+st.sidebar.markdown("ℹ️ Provide the video title and description, then click **Generate**. The app will use ChatGPT to produce a detailed evaluation

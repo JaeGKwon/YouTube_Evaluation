@@ -1,23 +1,23 @@
 import streamlit as st
 from openai import OpenAI
-import os
 
-# Initialize OpenAI client (reads from environment variable)
-#api_key = os.getenv("OPENAI_API_KEY")
-openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
-if not api_key:
-    st.error("❌ OPENAI_API_KEY environment variable not set. Please set it before running the app.")
+# Safely load API key
+if "OPENAI_API_KEY" not in st.secrets:
+    st.error("❌ OPENAI_API_KEY is missing in Streamlit secrets. Please add it under 'Manage App → Secrets'.")
     st.stop()
 
-client = OpenAI(api_key=api_key)
+# Initialize OpenAI client
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# Streamlit page config
+# Streamlit page setup
 st.set_page_config(page_title="YouTube Evaluation Generator", layout="wide")
 st.title("🎥 YouTube Evaluation Generator")
 
-st.markdown("Enter the details of the YouTube ad video below and click **Generate** to receive a full creative and strategic evaluation.")
+st.markdown(
+    "Enter the YouTube ad video details below and click **Generate** to receive a full creative and strategic evaluation."
+)
 
-# User inputs
+# Input fields
 video_title = st.text_input("Enter YouTube Video Title")
 video_description = st.text_area("Enter YouTube Video Description", height=200)
 
@@ -53,7 +53,7 @@ if st.button("Generate Evaluation"):
                 )
                 evaluation = response.choices[0].message.content
 
-                # Display generated evaluation
+                # Show output
                 st.subheader("📊 Generated Evaluation")
                 st.markdown(evaluation)
 
@@ -68,4 +68,4 @@ if st.button("Generate Evaluation"):
             except Exception as e:
                 st.error(f"❌ An error occurred: {e}")
 
-st.sidebar.markdown("ℹ️ Provide the video title and description, then click **Generate**. The app will use ChatGPT (GPT-4) to produce a detailed evaluation.")
+st.sidebar.markdown("ℹ️ Provide the video title and description, then click **Generate**. The app will use GPT-4 to produce a detailed evaluation.")

@@ -2,58 +2,69 @@ import streamlit as st
 from openai import OpenAI
 import os
 
-# Initialize OpenAI client
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Initialize OpenAI client (reads from environment variable)
+api_key = os.getenv("OPENAI_API_KEY")
+if not api_key:
+    st.error("❌ OPENAI_API_KEY environment variable not set. Please set it before running the app.")
+    st.stop()
 
+client = OpenAI(api_key=api_key)
+
+# Streamlit page config
 st.set_page_config(page_title="YouTube Evaluation Generator", layout="wide")
 st.title("🎥 YouTube Evaluation Generator")
+
+st.markdown("Enter the details of the YouTube ad video below and click **Generate** to receive a full creative and strategic evaluation.")
 
 # User inputs
 video_title = st.text_input("Enter YouTube Video Title")
 video_description = st.text_area("Enter YouTube Video Description", height=200)
 
 if st.button("Generate Evaluation"):
-    with st.spinner("Generating evaluation..."):
-        prompt = f"""
-        You are an expert marketing analyst. Please provide a full creative and strategic evaluation of the following YouTube ad video.
+    if not video_title or not video_description:
+        st.warning("⚠️ Please provide both a video title and description before generating.")
+    else:
+        with st.spinner("Generating evaluation... please wait."):
+            prompt = f"""
+            You are an expert marketing analyst. Please provide a full creative and strategic evaluation of the following YouTube ad video.
 
-        Video Title: {video_title}
+            Video Title: {video_title}
 
-        Video Description: {video_description}
+            Video Description: {video_description}
 
-        Your output should include:
-        1. Runtime & Format Overview
-        2. Scene-by-Scene Breakdown
-        3. Visual & Brand Identity
-        4. Emotional and Strategic Narrative
-        5. Competitive Positioning (compared to GEICO, State Farm, Progressive, Allstate)
-        6. Final Evaluation Scorecard
-        7. Key Takeaways and Opportunities
+            Your output should include:
+            1. Runtime & Format Overview
+            2. Scene-by-Scene Breakdown
+            3. Visual & Brand Identity
+            4. Emotional and Strategic Narrative
+            5. Competitive Positioning (compared to GEICO, State Farm, Progressive, Allstate)
+            6. Final Evaluation Scorecard
+            7. Key Takeaways and Opportunities
 
-        Present the output in structured bullet points and tables where appropriate.
-        """
+            Present the output in structured bullet points and tables where appropriate.
+            """
 
-        try:
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[{"role": "user", "content": prompt}],
-                temperature=0.5
-            )
-            evaluation = response.choices[0].message.content
+            try:
+                response = client.chat.completions.create(
+                    model="gpt-4",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.5
+                )
+                evaluation = response.choices[0].message.content
 
-            # Display generated evaluation
-            st.subheader("📊 Generated Evaluation")
-            st.markdown(evaluation)
+                # Display generated evaluation
+                st.subheader("📊 Generated Evaluation")
+                st.markdown(evaluation)
 
-            # Option to download as text file
-            st.download_button(
-                label="Download Evaluation as Text",
-                data=evaluation,
-                file_name="youtube_evaluation.txt",
-                mime="text/plain"
-            )
+                # Download button
+                st.download_button(
+                    label="📥 Download Evaluation as Text",
+                    data=evaluation,
+                    file_name="youtube_evaluation.txt",
+                    mime="text/plain"
+                )
 
-        except Exception as e:
-            st.error(f"❌ An error occurred: {e}")
+            except Exception as e:
+                st.error(f"❌ An error occurred: {e}")
 
-st.sidebar.markdown("ℹ️ Provide the video title and description, then click **Generate**. The app will use ChatGPT to produce a detailed evaluation
+st.sidebar.markdown("ℹ️ Provide the video title and description, then click **Generate**. The app will use ChatGPT (GPT-4) to produce a detailed evaluation.")

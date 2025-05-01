@@ -4,7 +4,7 @@ import os
 
 # Initialize OpenAI client (reads from environment variable)
 #api_key = os.getenv("OPENAI_API_KEY")
-api_key = st.secrets["OPENAI_API_KEY"]
+openai.api_key = st.secrets.get("OPENAI_API_KEY", "")
 if not api_key:
     st.error("❌ OPENAI_API_KEY environment variable not set. Please set it before running the app.")
     st.stop()

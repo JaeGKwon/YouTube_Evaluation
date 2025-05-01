@@ -1,25 +1,17 @@
 import streamlit as st
 from openai import OpenAI
 
-# Streamlit page setup
-st.set_page_config(page_title="YouTube Evaluation Generator", layout="wide")
-st.title("🎥 YouTube Evaluation Generator")
-
 # Safely load API key
-st.write("🔍 Checking for OpenAI API key...")
 if "OPENAI_API_KEY" not in st.secrets:
-    st.error("❌ OPENAI_API_KEY is missing in Streamlit secrets. Please add it under 'Manage App → Secrets'.")
+    st.error("OPENAI_API_KEY is missing in Streamlit secrets. Please add it under 'Manage App → Secrets'.")
     st.stop()
-else:
-    st.success("✅ Found OpenAI API key.")
 
 # Initialize OpenAI client
-try:
-    client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-    st.write("✅ OpenAI client initialized successfully.")
-except Exception as e:
-    st.exception(f"❌ Failed to initialize OpenAI client: {e}")
-    st.stop()
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
+
+# Streamlit page setup
+st.set_page_config(page_title="YouTube Evaluation Generator", layout="wide")
+st.title("YouTube Evaluation Generator")
 
 st.markdown(
     "Enter the YouTube ad video details below and click **Generate** to receive a full creative and strategic evaluation."
@@ -31,9 +23,10 @@ video_description = st.text_area("Enter YouTube Video Description", height=200)
 
 if st.button("Generate Evaluation"):
     if not video_title or not video_description:
-        st.warning("⚠️ Please provide both a video title and description before generating.")
+        st.warning("Please provide both a video title and description before generating.")
     else:
-        st.write("🔄 Preparing prompt...")
+        progress = st.progress(0, text="Starting evaluation...")
+
         prompt = f"""
         You are an expert marketing analyst. Please provide a full creative and strategic evaluation of the following YouTube ad video.
 
@@ -53,27 +46,33 @@ if st.button("Generate Evaluation"):
         Present the output in structured bullet points and tables where appropriate.
         """
 
-        with st.spinner("⏳ Generating evaluation... please wait."):
-            try:
-                st.write("🚀 Sending request to OpenAI...")
-                response = client.chat.completions.create(
-                    model="gpt-4",
-                    messages=[{"role": "user", "content": prompt}],
-                    temperature=0.5
-                )
-                st.success("✅ Response received from OpenAI.")
+        try:
+            progress.progress(25, text="Sending request to OpenAI...")
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5
+            )
+            progress.progress(75, text="Processing response...")
 
-                evaluation = response.choices[0].message.content
-                st.subheader("📊 Generated Evaluation")
-                st.markdown(evaluation)
+            evaluation = response.choices[0].message.content
 
-                st.download_button(
-                    label="📥 Download Evaluation as Text",
-                    data=evaluation,
-                    file_name="youtube_evaluation.txt",
-                    mime="text/plain"
-                )
+            progress.progress(100, text="Completed.")
+            st.subheader("Generated Evaluation")
+            st.markdown(evaluation)
 
-            except Exception as e:
-                st.error("❌ An error occurred during the OpenAI request.")
-                st.exception(e)
+            st.download_button(
+                label="Download Evaluation as Text",
+                data=evaluation,
+                file_name="youtube_evaluation.txt",
+                mime="text/plain"
+            )
+
+        except Exception as e:
+            progress.empty()
+            st.error("An error occurred during the OpenAI request.")
+            st.exception(e)
+
+st.sidebar.markdown(
+    "Provide the video title and description, then click Generate. The app will use GPT-4 to produce a detailed evaluation."
+)

@@ -1,3 +1,4 @@
 streamlit
 openai>=1.0.0
 youtube-transcript-api
+google-generativeai

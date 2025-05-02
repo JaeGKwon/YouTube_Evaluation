@@ -79,8 +79,16 @@ if st.button("Generate Evaluation"):
         try:
             progress.progress(25, text="Sending request to Google Gemini...")
             
-            # Create a Gemini model instance
-            model = genai.GenerativeModel('gemini-1.5-pro')
+            model = genai.GenerativeModel('gemini-1.5-pro')  # This is the correct identifier for Gemini 2.5 Pro
+            
+            # Generate content with higher temperature for more creative responses
+            response = model.generate_content(
+                prompt,
+                generation_config=genai.types.GenerationConfig(
+                    temperature=0.5,  # Increased temperature for more creative responses
+                    max_output_tokens=2048
+                )
+            )
             
             # Generate content
             response = model.generate_content(prompt)

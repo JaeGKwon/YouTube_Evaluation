@@ -28,52 +28,50 @@ if st.button("Generate Evaluation"):
         progress = st.progress(0, text="Starting evaluation...")
 
         prompt = f"""
-        You are an expert marketing analyst. Please provide a full creative and strategic evaluation of the following YouTube ad video.
+             You are an expert marketing analyst for AMICA Insurance. Please provide a factual and specific creative and strategic evaluation of the following AMICA YouTube ad video based ONLY on the information provided in the title and description.
 
         Video Title: {video_title}
 
         Video Description: {video_description}
 
+        IMPORTANT: This is specifically an AMICA insurance advertisement. Do not reference or compare to other insurance companies unless they are explicitly mentioned in the video description.
+
         Your output should include:
 
-            1, Runtime & Format Overview:
-
-            Note the length of the video and the format it's presented in (HD, 4K, etc.)
-            Discuss if the length is appropriate for the message being delivered.
-            Evaluate the quality of the video and if it matches the standard for similar ads in the industry.
+            1. Runtime & Format Overview:
+            
+            Based on the description, note what you can about the length and format.
+            Only mention specific technical details like HD/4K if mentioned in the description.
             
             2. Scene-by-Scene Breakdown:
-
-            Break down the video into different scenes and describe what happens in each.
-            Discuss the relevance of each scene to the overall message of the ad.
-            Analyze the transitions between scenes and how smoothly they flow.
+            
+            Based strictly on what's described in the video description, break down what appears to be happening.
+            Avoid making up scenes or details not mentioned in the description.
             
             3. Visual & Brand Identity:
             
-            Discuss the overall visual aesthetic of the ad.
-            Evaluate how well the ad represents the brand's identity.
-            Discuss the use of colors, logos, and other branding elements.
+            Discuss AMICA's brand identity elements mentioned in the description.
+            Only mention colors, logos, and branding elements explicitly described.
             
             4. Emotional and Strategic Narrative:
             
-            Analyze the story being told in the ad and how it connects to the viewer emotionally.
-            Discuss the strategic message being delivered and how effectively it is done.
+            Analyze how AMICA is positioning itself emotionally and strategically.
+            Focus on the specific message being conveyed about AMICA's insurance offerings.
             
             5. Competitive Positioning:
             
-            Compare the ad to similar ones from competitors like GEICO, State Farm, Progressive, Allstate.
-            Discuss how well the ad differentiates the brand from its competitors.
+            Only compare to competitors if specifically mentioned in the description.
+            If no competitors are mentioned, focus on how AMICA positions itself in the insurance market.
             
             6. Final Evaluation Scorecard:
             
-            Create a scorecard to evaluate different aspects of the ad (such as visual appeal, message clarity, emotional connection, etc.)
-            Give each aspect a score and provide a final overall score for the ad.
+            Create a scorecard evaluating different aspects of the AMICA ad.
+            Be factual and avoid speculation about elements not described.
             
-            7.Key Takeaways and Opportunities:
+            7. Key Takeaways and Opportunities:
             
-            Discuss the strengths of the ad and what it does well.
-            Identify areas where the ad could be improved or opportunities for future ads.
-            Do not include imagined visuals, unknown settings, or non-transcript details.
+            Discuss the strengths of the AMICA ad based on the description.
+            Suggest realistic improvements relevant to AMICA's brand and messaging.
 
         Present the output in structured bullet points and tables where appropriate.
         """
